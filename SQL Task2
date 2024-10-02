@@ -1,0 +1,72 @@
+CREATE TABLE Students (
+    StudentID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    DateOfBirth DATE,
+    Email VARCHAR(100),
+    Phone VARCHAR(15)
+);
+CREATE TABLE Courses (
+    CourseID INT PRIMARY KEY AUTO_INCREMENT,
+    CourseName VARCHAR(100) NOT NULL,
+    CourseCode VARCHAR(10) NOT NULL UNIQUE,
+    Credits INT CHECK (Credits > 0)
+);
+CREATE TABLE Enrollments (
+    EnrollmentID INT PRIMARY KEY AUTO_INCREMENT,
+    StudentID INT,
+    CourseID INT,
+    Grade CHAR(2),
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+    FOREIGN KEY (CourseID) REFERENCES Courses(CourseID),
+    UNIQUE(StudentID, CourseID)  -- To prevent duplicate enrollments
+);
+INSERT INTO Students (FirstName, LastName, DateOfBirth, Email, Phone) VALUES
+('John', 'Doe', '2000-01-15', 'john.doe@example.com', '123-456-7890'),
+('Jane', 'Smith', '1999-04-23', 'jane.smith@example.com', '234-567-8901');
+INSERT INTO Courses (CourseName, CourseCode, Credits) VALUES
+('Introduction to Databases', 'CS101', 3),
+('Data Structures', 'CS102', 4),
+('Web Development', 'CS103', 3);
+INSERT INTO Enrollments (StudentID, CourseID, Grade) VALUES
+(1, 1, 'A'),
+(1, 2, 'B'),
+(2, 1, 'A'),
+(2, 3, 'C');
+SELECT * FROM Students;
+SELECT * FROM Courses;
+SELECT 
+    s.FirstName,
+    s.LastName,
+    c.CourseName,
+    e.Grade
+FROM 
+    Enrollments e
+JOIN 
+    Students s ON e.StudentID = s.StudentID
+JOIN 
+    Courses c ON e.CourseID = c.CourseID;
+SELECT 
+    c.CourseName,
+    AVG(CASE e.Grade 
+        WHEN 'A' THEN 4.0 
+        WHEN 'B' THEN 3.0 
+        WHEN 'C' THEN 2.0 
+        WHEN 'D' THEN 1.0 
+        WHEN 'F' THEN 0.0 
+        END) AS AverageGrade
+FROM 
+    Enrollments e
+JOIN 
+    Courses c ON e.CourseID = c.CourseID
+GROUP BY 
+    c.CourseName;
+SELECT 
+    c.CourseName,
+    e.Grade
+FROM 
+    Enrollments e
+JOIN 
+    Courses c ON e.CourseID = c.CourseID
+WHERE 
+    e.StudentID = 1;  -- Change 1 to the specific StudentID
